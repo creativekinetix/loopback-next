@@ -7,7 +7,7 @@
 
 import {TokenService, UserService} from '@loopback/authentication';
 import {inject} from '@loopback/context';
-import {post, requestBody} from '@loopback/rest';
+import {post, requestBody, Response} from '@loopback/rest';
 import {
   Credentials,
   TokenServiceBindings,
