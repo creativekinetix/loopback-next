@@ -55,9 +55,18 @@ describe('validate properties', () => {
       phoneNum: '999-111-1111',
       capacity: 10,
     };
+    await client.post('/coffee-shops').send(invalidAreaCodeCS).expect(400);
+  });
+
+  it('create CoffeeShop failed with invalid type', async () => {
+    const invalidCapacityTypeCS = {
+      city: 'Toronto',
+      phoneNum: '416-111-1111',
+      capacity: '10',
+    };
     const response = await client
       .post('/coffee-shops')
-      .send(invalidAreaCodeCS)
+      .send(invalidCapacityTypeCS)
       .expect(422);
 
     // with customized response

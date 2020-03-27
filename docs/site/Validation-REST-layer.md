@@ -175,3 +175,48 @@ of 10 digits separated by `-` after the 3rd and 6th digits.
 ```
 
 {% include tip.html content="RegExp can be converted into a string with `.source` to avoid escaping backslashes" %}
+
+## Customize validation errors
+
+Since the error is being caught at the REST layer, the best way to customize the
+errors is to
+[customize the sequence of actions](https://loopback.io/doc/en/lb4/Sequence.html#customizing-sequence-actions)
+using a
+[Provider](https://loopback.io/doc/en/lb4/apidocs.context.provider.html).
+
+To do so, create a Provider class in `src/providers` folder that implements
+`Provider<Reject>`. Using the
+[validation-app](https://github.com/strongloop/loopback-next/tree/master/examples/validation-app)
+as an example, here is how the Provider class look like:
+
+{% include code-caption.html content="/src/providers/my-validation-error-provider.ts" %}
+
+```ts
+import {Provider} from '@loopback/core';
+import {HandlerContext, HttpErrors, Reject} from '@loopback/rest';
+export class MyValidationErrorProvider implements Provider<Reject> {
+  //...
+  action({request, response}: HandlerContext, error: Error) {
+    // handle the error and send back the error response
+    // "response" is an Express Response object
+    response.setHeader('Content-Type', 'application/json');
+    const httpError = <HttpErrors.HttpError>error;
+    if (request.url === '/coffee-shops') {
+      // if this is a validation error
+      if (httpError.statusCode === 422) {
+        // you can customize the error message and status code here
+        const newError = {
+          message: 'My customized validation error message',
+          code: 'VALIDATION_FAILED',
+          resolution: 'Contact your admin for troubleshooting.',
+        };
+
+        // you can change the status code here too
+        response.status(422).send(JSON.stringify(newError));
+      }
+    }
+
+    response.status(httpError.statusCode).end(JSON.stringify(httpError));
+  }
+}
+```

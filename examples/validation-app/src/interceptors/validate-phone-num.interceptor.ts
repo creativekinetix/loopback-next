@@ -60,7 +60,8 @@ export class ValidatePhoneNumInterceptor implements Provider<Interceptor> {
       const err: ValidationError = new ValidationError(
         'Area code and city do not match',
       );
-      err.statusCode = 422;
+      // change the error status code to 400 - "Bad Request"
+      err.statusCode = 400;
       throw err;
     }
 
