@@ -7,6 +7,7 @@ const _ = require('lodash');
 const git = require('./git');
 const path = require('path');
 const fs = require('fs-extra');
+const chalk = require('chalk');
 const Project = require('@lerna/project');
 
 const {promisify} = require('util');
@@ -155,7 +156,8 @@ async function ensureHeader(file, pkg, options = {}) {
   if (!options.dryRun) {
     await fs.writeFile(file, content, 'utf8');
   } else {
-    console.log(file, header);
+    const log = options.log || console.log;
+    log(file, header);
   }
   return content;
 }
@@ -250,14 +252,16 @@ async function updateFileHeaders(projectRoot, options = {}) {
 async function updateFileHeadersForSinglePackage(projectRoot, options) {
   debug('Options', options);
   debug('Project root: %s', projectRoot);
+  const log = options.log || console.log;
   const pkgFile = path.join(projectRoot, 'package.json');
   const exists = await fs.exists(pkgFile);
   if (!exists) {
-    console.error('No package.json exists at %s.', projectRoot);
+    log(chalk.red(`No package.json exists at ${projectRoot}`));
     return;
   }
   const pkg = await fs.readJson(pkgFile);
-  console.log(
+
+  log(
     'Updating project %s (%s)',
     pkg.name,
     path.relative(process.cwd(), projectRoot) || '.',

@@ -26,6 +26,12 @@ module.exports = class CopyrightGenerator extends BaseGenerator {
       required: false,
       description: g.f('License'),
     });
+    this.option('gitOnly', {
+      type: Boolean,
+      required: false,
+      default: true,
+      description: g.f('Only update git tracked files'),
+    });
     return super.setOptions();
   }
 
@@ -64,6 +70,8 @@ module.exports = class CopyrightGenerator extends BaseGenerator {
     this.headerOptions = {
       copyrightOwner: answers.owner || this.options.owner,
       license: answers.license || this.options.license,
+      log: this.log,
+      gitOnly: this.options.gitOnly,
     };
   }
 
