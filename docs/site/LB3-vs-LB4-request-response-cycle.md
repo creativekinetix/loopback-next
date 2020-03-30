@@ -18,14 +18,15 @@ equivalent, if there is any.
 
 ### Request/response infrastructure
 
-The difference begins with the LoopBack object itself. In LoopBack 3, it is an
-instance of an Express app; in LoopBack 4, it is not. Although LoopBack 4 uses
-Express as the HTTP server, it is not directly exposed anymore.
+The difference begins with the LoopBack application object itself. In
+LoopBack 3, it is an instance of an Express app; in LoopBack 4, it is not.
+Although LoopBack 4 uses Express as the HTTP server, it is not directly exposed
+anymore.
 
 In LoopBack 3 you could add routes and load custom middleware using `app.get()`,
 `app.post()`, `app.use()`, etc., just like how you do in Express.
 In LoopBack 4, you cannot do it anymore. The closest to doing this is to use the
-[RestApplication.mountExpressRouter() ](https://loopback.io/doc/en/lb4/apidocs.rest.restapplication.mountexpressrouter.html)
+[RestApplication.mountExpressRouter()](https://loopback.io/doc/en/lb4/apidocs.rest.restapplication.mountexpressrouter.html)
 API. This API allows you to mount a custom Express router on the LoopBack app.
 
 Using [Controllers](https://loopback.io/doc/en/lb4/Controllers.html) is the
@@ -35,15 +36,16 @@ support for
 and [Interceptors](https://loopback.io/doc/en/lb4/Interceptors.html) makes it a
 very powerful extension mechanism.
 
-LoopBack 4 has gotten rid of
+In LoopBack 4
 [middleware.json](https://loopback.io/doc/en/lb3/middleware.json.html)
-by. It is not require anymore because of the architectural changes.
+is not require anymore because of architectural changes.
 
-In LoopBack 3, models files automatically created the corresponding REST API
-endpoints and the database query machinery. In LoopBack, model files are limited
-only to describing the properties of the data. You will have to create a
-corresponding [Repository](https://loopback.io/doc/en/lb4/Repositories.html) for
-database connectivity, and controller creating the REST API endpoint.
+In LoopBack 3, models files automatically create the corresponding REST API
+endpoints and the database query machinery (using the configured datasource).
+In LoopBack 4, model files are limited only to describing the properties of the
+data. You will have to create a corresponding
+[Repository](https://loopback.io/doc/en/lb4/Repositories.html)
+for database connectivity, and controller creating the REST API endpoint.
 
 The fact that you have to create two more artifacts along with the model to
 get a REST endpoint working might seem overly tedious at first. However, the
@@ -51,6 +53,15 @@ separation of concerns and decoupling the functionality makes the codebase
 cleaner, easier to maintain, and much easier to customize functionality at
 various levels. This can be better appreciated as the complexity of your app
 grows.
+
+For those who are uncomfortable with the concept of having to creating a
+repository and a controller for a model, we have a component
+[@loopback/rest-crud
+](https://loopback.io/doc/en/lb4/Creating-crud-rest-apis.html)
+; with a little bit of configuration, a model file is all you will need to
+create the REST endpoints. Once your requirements outgrow what
+`@loopback/rest-crud` provides, you can implement your REST endpoints the
+idiomatic way.
 
 Components are still supported in LoopBack 4, but the concept of component
 has completely changed.
