@@ -191,9 +191,8 @@ module.exports = class DataSourceGenerator extends ArtifactGenerator {
           break;
         default:
           console.warn(
-            `Using default input of type input for setting ${key} as ${
-              setting.type || undefined
-            } is not supported`,
+            `Using default input of type input for setting ${key} as ${setting.type ||
+              undefined} is not supported`,
           );
           // Default to input type
           question.type = 'input';
@@ -247,10 +246,6 @@ module.exports = class DataSourceGenerator extends ArtifactGenerator {
     this.artifactInfo.outFile = `${this.artifactInfo.fileName}.datasource.ts`;
 
     // Resolved Output Paths.
-    const jsonPath = this.destinationPath(
-      this.artifactInfo.outDir,
-      this.artifactInfo.jsonFileName,
-    );
     const tsPath = this.destinationPath(
       this.artifactInfo.outDir,
       this.artifactInfo.outFile,
@@ -263,31 +258,31 @@ module.exports = class DataSourceGenerator extends ArtifactGenerator {
     debug(`this.artifactInfo.name => ${this.artifactInfo.name}`);
     debug(`this.artifactInfo.className => ${this.artifactInfo.className}`);
     debug(`this.artifactInfo.fileName => ${this.artifactInfo.fileName}`);
-    // prettier-ignore
-    debug(`this.artifactInfo.jsonFileName => ${this.artifactInfo.jsonFileName}`);
     debug(`this.artifactInfo.outFile => ${this.artifactInfo.outFile}`);
-    debug(`jsonPath => ${jsonPath}`);
     debug(`tsPath => ${tsPath}`);
 
     // Data to save to DataSource JSON file
-    const ds = Object.assign(
+    const dsConfig = Object.assign(
       {name: this.artifactInfo.name, connector: this.artifactInfo.connector},
       this.artifactInfo.settings,
     );
 
     // From LB3
-    if (ds.connector === 'ibm-object-storage') {
-      ds.connector = 'loopback-component-storage';
-      ds.provider = 'openstack';
-      ds.useServiceCatalog = true;
-      ds.useInternal = false;
-      ds.keystoneAuthVersion = 'v3';
+    if (dsConfig.connector === 'ibm-object-storage') {
+      dsConfig.connector = 'loopback-component-storage';
+      dsConfig.provider = 'openstack';
+      dsConfig.useServiceCatalog = true;
+      dsConfig.useInternal = false;
+      dsConfig.keystoneAuthVersion = 'v3';
     }
 
-    debug(`datasource information going to file: ${JSON.stringify(ds)}`);
+    this.artifactInfo.dsConfigString = utils.stringifyObject(dsConfig, {
+      // Prevent inlining the config into a single line, e.g.
+      // const config = {name: 'db', connector: 'memory'};
+      inlineCharacterLimit: 0,
+    });
+    debug(`datasource configuration code: ${this.artifactInfo.dsConfigString}`);
 
-    // Copy Templates
-    this.fs.writeJSON(jsonPath, ds);
     this.copyTemplatedFiles(classTemplatePath, tsPath, this.artifactInfo);
   }
 

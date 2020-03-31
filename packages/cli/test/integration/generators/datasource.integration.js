@@ -49,22 +49,10 @@ const complexCLIInput = {
   operations: '["get", "post"]',
 };
 
-const expectedComplexJSONOutput = {
-  name: 'ds',
-  connector: 'rest',
-  options: {test: 'value'},
-  operations: ['get', 'post'],
-};
-
 // Expected File Name
 const expectedTSFile = path.join(
   SANDBOX_PATH,
   'src/datasources/ds.datasource.ts',
-);
-
-const expectedJSONFile = path.join(
-  SANDBOX_PATH,
-  'src/datasources/ds.datasource.config.json',
 );
 
 const expectedIndexFile = path.join(SANDBOX_PATH, 'src/datasources/index.ts');
@@ -105,9 +93,7 @@ describe('lb4 datasource integration', () => {
         .inDir(SANDBOX_PATH, () => testUtils.givenLBProject(SANDBOX_PATH))
         .withPrompts(basicCLIInput);
 
-      checkBasicDataSourceFiles();
-
-      assert.jsonFileContent(expectedJSONFile, basicCLIInput);
+      checkDataSourceFilesAgainstSnapshot();
     });
 
     it('scaffolds correct file with args', async () => {
@@ -116,8 +102,7 @@ describe('lb4 datasource integration', () => {
         .inDir(SANDBOX_PATH, () => testUtils.givenLBProject(SANDBOX_PATH))
         .withArguments('ds');
 
-      checkBasicDataSourceFiles();
-      assert.jsonFileContent(expectedJSONFile, basicCLIInput);
+      checkDataSourceFilesAgainstSnapshot();
     });
   });
 
@@ -127,8 +112,7 @@ describe('lb4 datasource integration', () => {
       .inDir(SANDBOX_PATH, () => testUtils.givenLBProject(SANDBOX_PATH))
       .withPrompts(cloudantCLIInput);
 
-    checkBasicDataSourceFiles();
-    assert.jsonFileContent(expectedJSONFile, cloudantCLIInput);
+    checkDataSourceFilesAgainstSnapshot();
   });
 
   it('correctly coerces setting input of type number', async () => {
@@ -137,11 +121,7 @@ describe('lb4 datasource integration', () => {
       .inDir(SANDBOX_PATH, () => testUtils.givenLBProject(SANDBOX_PATH))
       .withPrompts(numberCLIInput);
 
-    checkBasicDataSourceFiles();
-    assert.jsonFileContent(
-      expectedJSONFile,
-      Object.assign({}, numberCLIInput, {port: 100}),
-    );
+    checkDataSourceFilesAgainstSnapshot();
   });
 
   it('correctly coerces setting input of type object and array', async () => {
@@ -150,14 +130,12 @@ describe('lb4 datasource integration', () => {
       .inDir(SANDBOX_PATH, () => testUtils.givenLBProject(SANDBOX_PATH))
       .withPrompts(complexCLIInput);
 
-    checkBasicDataSourceFiles();
-    assert.jsonFileContent(expectedJSONFile, expectedComplexJSONOutput);
+    checkDataSourceFilesAgainstSnapshot();
   });
 });
 
-function checkBasicDataSourceFiles() {
+function checkDataSourceFilesAgainstSnapshot() {
   assert.file(expectedTSFile);
-  assert.file(expectedJSONFile);
   assert.file(expectedIndexFile);
   assert.noFile(path.join(SANDBOX_PATH, 'node_modules/memory'));
 
