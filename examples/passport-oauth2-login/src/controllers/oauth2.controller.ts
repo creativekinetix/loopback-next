@@ -3,16 +3,25 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import {
-  get,
-  RestBindings,
-  Response,
-  HttpHandler,
-  RequestContext,
-} from '@loopback/rest';
+import {get, RestBindings, Response, Request} from '@loopback/rest';
 import {authenticate} from '@loopback/authentication';
 import {inject} from '@loopback/core';
 import {SecurityBindings, UserProfile} from '@loopback/security';
+
+interface Session {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
+
+interface RequestWithSession extends Request {
+  session: Session;
+}
+
+interface SessionProfile {
+  user: UserProfile;
+  provider: string;
+  token: string;
+}
 
 /**
  * Login controller for third party oauth provider
@@ -69,22 +78,21 @@ export class Oauth2Controller {
   // the verify function creates a user profile after verifying the access token
   async thirdPartyCallBack(
     @inject(SecurityBindings.USER) user: UserProfile,
-    @inject(RestBindings.Http.CONTEXT) context: RequestContext,
-    @inject(RestBindings.HANDLER) handler: HttpHandler,
+    @inject(RestBindings.Http.REQUEST) request: RequestWithSession,
+    @inject(RestBindings.Http.RESPONSE) response: Response,
   ) {
-    const request = context.request;
-    request.user = {
-      profiles: [
-        {
-          user: user.profile.profile._json,
-          token: user.profile.token,
-          provider: user.profile.profile.provider,
-        },
-      ],
+    const userProfile: SessionProfile = {
+      ...user.profile
     };
-    request.url = '/auth/account';
-    request.method = 'get';
-    await handler.findRoute(request).invokeHandler(context, []);
-    return context.response;
+    if (!request.session.user) {
+      request.session.user = {
+        profiles: [userProfile],
+      };
+    }
+    if (request.session.user) {
+      request.session.user.profiles.push(userProfile);
+    }
+    response.redirect('/auth/account');
+    return response;
   }
 }

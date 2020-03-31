@@ -9,23 +9,22 @@ import {
   UserProfileFactory,
 } from '@loopback/authentication';
 import {StrategyAdapter} from './strategy-adapter';
-import {Strategy, StrategyOption, Profile} from 'passport-facebook';
+import {Profile} from 'passport';
+import {Strategy, StrategyOption} from 'passport-facebook';
 import {bind, inject} from '@loopback/context';
 import {Request} from '@loopback/rest';
 import {UserProfile, securityId} from '@loopback/security';
-import {UserService, UserServiceBindings} from '../services';
-import {User} from '../models';
-import {asSpecEnhancer, OASEnhancer} from '@loopback/openapi-v3';
+import {UserService, UserServiceBindings, UserWithToken} from '../services';
 
 const options: StrategyOption = {
   clientID: '202843417684514',
   clientSecret: 'ad4315e3453b012f6e4b8dd4bc1c0ae6',
-  callbackURL: '/auth/thirdparty/callback',
+  callbackURL: '/api/auth/thirdparty/callback',
+  profileFields: ['id', 'displayName', 'email', 'name']
 };
 
-@bind(asAuthStrategy, asSpecEnhancer)
-export class Oauth2Authorization
-  implements AuthenticationStrategy, OASEnhancer {
+@bind(asAuthStrategy)
+export class Oauth2Authorization implements AuthenticationStrategy {
   name = 'Oauth2';
   facebookStrategy: Strategy;
   facebookAuthentication: StrategyAdapter<Profile>;
@@ -40,11 +39,6 @@ export class Oauth2Authorization
       'facebook',
       mapFaceBookProfile,
     );
-  }
-  modifySpec(
-    spec: import('@loopback/rest').OpenAPIObject,
-  ): import('@loopback/rest').OpenAPIObject {
-    throw new Error('Method not implemented.');
   }
 
   async authenticate(request: Request): Promise<UserProfile | undefined> {
@@ -71,18 +65,20 @@ export class Oauth2Authorization
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     done: (error: any, user?: any, info?: any) => void,
   ) {
-    const userProfile: UserProfile = mapFaceBookProfile(profile);
-    this.userService
-      .findOrCreateExternalUser(userProfile)
-      .then((user: User) => {
-        user.token = accessToken;
+    if (profile.emails && profile.emails.length) {
+      this.userService
+      .findOrCreateExternalUser(profile.emails[0].value, profile, accessToken)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .then((user: any) => {
         done(null, user);
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch((err: any) => {
-        console.log(err);
         done(err);
       });
+    } else {
+      done(new Error('email-id is required in returned profile to login'));
+    }
   }
 }
 
@@ -91,14 +87,16 @@ export class Oauth2Authorization
  * @param user
  */
 export const mapFaceBookProfile: UserProfileFactory<Profile> = function (
-  user: Profile,
+  profile: Profile,
 ): UserProfile {
+  let user = profile as UserWithToken;
   const userProfile: UserProfile = {
     [securityId]: user.id,
     profile: {
       ...user,
-      source: 'facebook',
-    },
+      _json: null,
+      _raw: null
+    }
   };
   return userProfile;
 };

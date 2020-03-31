@@ -7,7 +7,6 @@ import {BootMixin} from '@loopback/boot';
 import {RepositoryMixin} from '@loopback/repository';
 import {RestApplication} from '@loopback/rest';
 import {ServiceMixin} from '@loopback/service-proxy';
-import path from 'path';
 import {MySequence} from './sequence';
 import {
   AuthenticationComponent,
@@ -34,15 +33,7 @@ export class Oauth2LoginApplication extends BootMixin(
     // Set up the custom sequence
     this.sequence(MySequence);
 
-    // Set up default home page
-    this.static('/', path.join(__dirname, '../public'));
-
-    const client = require('../client/app');
-
-    this.mountExpressRouter('/', client);
-
     this.controller(Oauth2Controller);
-
     this.component(AuthenticationComponent);
 
     this.bind(AuthenticationBindings.AUTH_ACTION).toProvider(

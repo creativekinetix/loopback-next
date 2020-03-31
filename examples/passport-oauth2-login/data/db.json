@@ -1,0 +1,13 @@
+{
+  "ids": {
+    "User": 5
+  },
+  "models": {
+    "User": {
+      "1": "{\"id\":1,\"username\":\"John\",\"email\":\"john@doe.com\"}",
+      "2": "{\"id\":2,\"username\":\"Jane\",\"email\":\"jane@doe.com\"}",
+      "3": "{\"id\":3,\"username\":\"Bob\",\"email\":\"bob@projects.com\"}",
+      "4": "{\"email\":\"dplojbdiuc_1585460374@tfbnw.net\",\"name\":{},\"id\":4}"
+    }
+  }
+}

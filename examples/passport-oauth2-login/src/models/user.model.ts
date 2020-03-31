@@ -3,9 +3,7 @@
 // This file is licensed under the MIT License.
 // License text available at https://opensource.org/licenses/MIT
 
-import {Entity, hasMany, hasOne, model, property} from '@loopback/repository';
-import {UserCredentials} from './user-credentials.model';
-import {AccessToken} from './access-token.model';
+import {Entity, model, property} from '@loopback/repository';
 
 @model({
   settings: {
@@ -17,10 +15,14 @@ export class User extends Entity {
   @property({
     type: 'number',
     id: 1,
-    generated: false,
-    updateOnly: true,
+    generated: true,
   })
   id: number;
+
+  @property({
+    type: 'string',
+  })
+  name: string;
 
   @property({
     type: 'string',
@@ -31,7 +33,7 @@ export class User extends Entity {
   @property({
     type: 'string',
   })
-  username?: string;
+  username: string;
 
   // must keep it
   @property({
@@ -49,14 +51,6 @@ export class User extends Entity {
     type: 'string',
   })
   verificationToken?: string;
-
-  @hasOne(() => UserCredentials)
-  userCredentials?: UserCredentials;
-
-  @hasMany(() => AccessToken)
-  accessTokens?: AccessToken[];
-
-  // Define well-known properties here
 
   // Indexer property to allow additional data
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

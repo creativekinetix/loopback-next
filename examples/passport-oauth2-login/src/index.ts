@@ -1,16 +1,16 @@
-import {Oauth2LoginApplication} from './application';
-import {ApplicationConfig} from '@loopback/core';
+// Copyright IBM Corp. 2019. All Rights Reserved.
+// Node module: @loopback/example-passport-oauth2-login
+// This file is licensed under the MIT License.
+// License text available at https://opensource.org/licenses/MIT
 
-export {Oauth2LoginApplication};
+import {ApplicationConfig} from '@loopback/core';
+import {ExpressServer} from './server';
+
+export {ExpressServer};
 
 export async function main(options: ApplicationConfig = {}) {
-  const app = new Oauth2LoginApplication(options);
-  await app.boot();
-  await app.start();
-
-  const url = app.restServer.url;
-  console.log(`Server is running at ${url}`);
-  console.log(`Try ${url}/ping`);
-
-  return app;
+  const server = new ExpressServer(options);
+  await server.boot();
+  await server.start();
+  console.log(`Server is running at ${server.url}`);
 }

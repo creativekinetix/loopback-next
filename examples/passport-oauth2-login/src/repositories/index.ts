@@ -4,4 +4,3 @@
 // License text available at https://opensource.org/licenses/MIT
 
 export * from './user.repository';
-export * from './user-credentials.repository';
