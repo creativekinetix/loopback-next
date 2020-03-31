@@ -50,10 +50,10 @@ Once all the prompts have been answered, the CLI will do the following:
 
 - Install `@loopback/repository` and the connector package (if it's not a custom
   connector).
-- Create a file with the connector configuration as follows:
-  `/src/datasources/${dataSource.dataSourceName}.datasource.config.json`
-- Create a DataSource class which recieves the connector config using
+- Create a DataSource class which receives the connector config using
   [Dependency Injection](Dependency-injection.md) as follows:
-  `/src/datasources/${dataSource.dataSourceName}.datasource.ts`
+  `/src/datasources/${dataSource.dataSourceName}.datasource.ts`. The connector
+  configuration provided via CLI is available via static property
+  `defaultConfig`.
 - Update `/src/datasources/index.ts` to export the newly created DataSource
   class.

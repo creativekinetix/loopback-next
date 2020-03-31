@@ -53,31 +53,31 @@ servicMethodName: {
 ```
 
 If you have more than one operations to map, it might be easier to edit the
-DataSource JSON after it's been created. See below for the example of the
-mapping of the WSDL binding operations and Node.js methods.
+DataSource configuration after it's been created. See below for the example of
+the mapping of the WSDL binding operations and Node.js methods.
 
-```json
-{
-  "name": "ds",
-  "connector": "soap",
-  "url": "http://calculator-webservice.mybluemix.net/calculator",
-  "wsdl": "http://calculator-webservice.mybluemix.net/calculator?wsdl",
-  "remotingEnabled": true,
+```ts
+const config = {
+  name: 'ds',
+  connector: 'soap',
+  url: 'http://calculator-webservice.mybluemix.net/calculator',
+  wsdl: 'http://calculator-webservice.mybluemix.net/calculator?wsdl',
+  remotingEnabled: true,
   // ADD THIS SNIPPET
-  "operations": {
-    "add": {
-      "service": "CalculatorService", //WSDL service name
-      "port": "CalculatorPort", //WSDL port name
-      "operation": "add" //WSDL operation name
+  operations: {
+    add: {
+      service: 'CalculatorService', //WSDL service name
+      port: 'CalculatorPort', //WSDL port name
+      operation: 'add', //WSDL operation name
     },
-    "subtract": {
-      "service": "CalculatorService",
-      "port": "CalculatorPort",
-      "operation": "subtract"
-    }
-  }
+    subtract: {
+      service: 'CalculatorService',
+      port: 'CalculatorPort',
+      operation: 'subtract',
+    },
+  },
   // END OF THE SNIPPET
-}
+};
 ```
 
 For details, you can refer to the SOAP connector's operations property:
@@ -98,8 +98,7 @@ $ lb4 datasource
 ? Use default CRUD mapping: No
 ```
 
-The next step is to edit the DataSource JSON file for `options` and
-`operations`.
+The next step is to edit the DataSource file for `options` and `operations`.
 
 The REST connector uses the
 [request module](https://www.npmjs.com/package/request) as the HTTP client. You
@@ -110,30 +109,30 @@ The `template` object specifies the REST API invocation as a JSON template. You
 can find more details in the
 [Defining a custom method using a template page](https://loopback.io/doc/en/lb4/REST-connector.html#defining-a-custom-method-using-a-template).
 
-```json
-{
-  "name": "restds",
-  "connector": "rest",
-  "baseURL": "https://swapi.co/api/",
-  "crud": false,
-  "options": {
-    "headers": {
-      "accept": "application/json",
-      "content-type": "application/json"
-    }
+```ts
+const config = {
+  name: 'restds',
+  connector: 'rest',
+  baseURL: 'https://swapi.co/api/',
+  crud: false,
+  options: {
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+    },
   },
-  "operations": [
+  operations: [
     {
-      "template": {
-        "method": "GET",
-        "url": "https://swapi.co/api/people/{personId}"
+      template: {
+        method: 'GET',
+        url: 'https://swapi.co/api/people/{personId}',
       },
-      "functions": {
-        "getCharacter": ["personId"]
-      }
-    }
-  ]
-}
+      functions: {
+        getCharacter: ['personId'],
+      },
+    },
+  ],
+};
 ```
 
 Refer to the detailed information in [configure the options] and [templates].
